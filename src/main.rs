@@ -68,11 +68,18 @@ impl FromStr for Format {
     }
 }
 
-fn main() {
+fn main() -> Result<(), i32> {
     let opts = Opts::parse_args_default_or_exit();
 
-    let from = read_lockfile(opts.from).unwrap();
-    let to = read_lockfile(opts.to).unwrap();
+    let from = read_lockfile(&opts.from, &opts.path).map_err(|e| {
+        eprintln!("could not read 'from' file; {}", e);
+        1
+    })?;
+
+    let to = read_lockfile(&opts.to, &opts.path).map_err(|e| {
+        eprintln!("could not read 'to' file; {}", e);
+        1
+    })?;
 
     let diff = diff(&from, &to);
 
@@ -86,6 +93,8 @@ fn main() {
     }
 
     table.printstd();
+
+    Ok(())
 }
 
 fn format_markdown() -> TableFormat {
@@ -99,28 +108,47 @@ fn format_markdown() -> TableFormat {
         .build()
 }
 
-fn read_lockfile(source: String) -> Result<Lockfile, io::Error> {
-    let path = Path::new(&source);
+fn read_lockfile(source: &str, base: &str) -> Result<Lockfile, io::Error> {
+    let path = Path::new(base).join(source);
 
     if path.exists() {
-        Ok(Lockfile::load(path).unwrap())
-    } else {
-        let output = Command::new("env")
-            .arg("git")
-            .arg("show")
-            .arg(source)
-            .output()?;
-
-        if !output.status.success() {
-            let e = io::Error::from_raw_os_error(output.status.code().unwrap_or(1));
-            return Err(io::Error::new(io::ErrorKind::Other, e));
-        }
-
-        from_utf8(&output.stdout)
-            .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?
-            .parse()
-            .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))
+        return Ok(Lockfile::load(path).unwrap());
     }
+
+    if let Some(f) = lockfile_from_git(source, base)? {
+        return Ok(f);
+    }
+
+    // Try others
+
+    Err(io::Error::from(io::ErrorKind::NotFound))
+}
+
+fn lockfile_from_git(maybe_ref: &str, path_base: &str) -> Result<Option<Lockfile>, io::Error> {
+    let gitpath = if maybe_ref.contains(':') {
+        let parts: Vec<&str> = maybe_ref.splitn(2, ':').collect();
+        let mut path = std::path::PathBuf::new();
+        path.push(&path_base);
+        if let Some(s) = parts.get(1) {
+            path.push(s)
+        }
+        [parts[0], ":", path.to_str().unwrap()].join("")
+    } else {
+        maybe_ref.to_owned()
+    };
+
+    let output = Command::new("git").arg("show").arg(gitpath).output()?;
+
+    if !output.status.success() {
+        let e = io::Error::from_raw_os_error(output.status.code().unwrap_or(1));
+        return Err(io::Error::new(io::ErrorKind::Other, e));
+    }
+
+    from_utf8(&output.stdout)
+        .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?
+        .parse()
+        .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))
+        .map(|f| Some(f))
 }
 
 struct Changes {
