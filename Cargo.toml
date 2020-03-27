@@ -1,0 +1,12 @@
+[package]
+name = "cargo-lock-diff"
+version = "0.1.0"
+authors = ["David Jonas <djonas@noip.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+cargo-lock = { version = "4", default-features = false, features = [] }
+gumdrop = "0.7"
+prettytable-rs = "0.8"
