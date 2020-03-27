@@ -1,14 +1,17 @@
-use std::collections::HashMap;
 use std::fmt;
-use std::io;
-use std::path::Path;
-use std::process::Command;
-use std::str::from_utf8;
 use std::str::FromStr;
+use std::sync::atomic::{AtomicBool, Ordering::Relaxed};
 
-use cargo_lock::Lockfile;
 use gumdrop::Options;
 use prettytable::{cell, format::TableFormat, row, Table};
+
+mod diff;
+mod load;
+
+use diff::*;
+use load::*;
+
+static VERBOSE: AtomicBool = AtomicBool::new(false);
 
 #[derive(Debug, Options)]
 struct Opts {
@@ -16,43 +19,130 @@ struct Opts {
     help: bool,
 
     #[options(
-        default = "./",
+        //default = "",
         help = "Base to with which to prefix paths. E.g. `-p app` would look for HEAD:app/Cargo.lock and app/Cargo.lock"
     )]
     path: String,
 
     #[options(
         no_short,
-        default = "HEAD:Cargo.lock",
+        default = "HEAD",
         help = "The  file, git ref, or git ref with filename to compare from."
     )]
     from: String,
 
     #[options(
         no_short,
-        default = "Cargo.lock",
         help = "The file, git ref, or git ref with filename to compare to."
     )]
     to: String,
 
-    #[options(no_short, help = "Only include changes from `dependencies`")]
-    only_prod: bool,
+    // #[options(no_short, help = "Only include changes from `dependencies`")]
+    // only_prod: bool,
 
-    #[options(no_short, help = "Only include changes from `dev-dependencies`")]
-    only_dev: bool,
+    // #[options(no_short, help = "Only include changes from `dev-dependencies`")]
+    // only_dev: bool,
+    #[options(short = "l", help = "Include links to where possible")]
+    links: bool,
 
-    #[options(no_short, help = "Do not include any links")]
-    no_links: bool,
-
-    #[options(no_short, default = "markdown", help = "Do not include any links")]
+    #[options(short = "f", default = "markdown", help = "Output format: markdown")]
     format: Format,
+
+    #[options(short = "v", help = "Show some extra messages")]
+    verbose: bool,
 }
 
 #[derive(Debug)]
 enum Format {
     Markdown,
-    Json,
-    PrettyJson,
+}
+
+#[derive(Debug, PartialEq)]
+enum ErrorMsg {
+    None,
+    NotFound,
+    CommandFailed(&'static str),
+}
+
+impl fmt::Display for ErrorMsg {
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        use ErrorMsg::*;
+        match self {
+            None => return Ok(()),
+            NotFound => f.write_str("not found"),
+            CommandFailed(cmd) => write!(f, "'{}' command failed", cmd),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct Error {
+    msg: ErrorMsg,
+    source: Option<Box<dyn std::error::Error + 'static>>,
+}
+
+impl Error {
+    fn with_err<E: std::error::Error + 'static>(msg: ErrorMsg, err: E) -> Self {
+        Error {
+            msg,
+            source: Some(Box::new(err)),
+        }
+    }
+}
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        if self.msg != ErrorMsg::None {
+            self.msg.fmt(f)?;
+        }
+
+        if let Some(err) = &self.source {
+            if self.msg != ErrorMsg::None {
+                f.write_str("\nErrors:\n  + ")?;
+            }
+            write!(f, "{:?}", err)?;
+        }
+
+        Ok(())
+    }
+}
+
+impl std::error::Error for Error {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        self.source.as_ref().map(|v| v.as_ref())
+    }
+}
+
+impl From<ErrorMsg> for Error {
+    fn from(msg: ErrorMsg) -> Self {
+        Self { msg, source: None }
+    }
+}
+
+impl From<cargo_lock::error::Error> for Error {
+    fn from(e: cargo_lock::error::Error) -> Self {
+        Self {
+            msg: ErrorMsg::None,
+            source: Some(Box::new(e)),
+        }
+    }
+}
+impl From<std::io::Error> for Error {
+    fn from(e: std::io::Error) -> Self {
+        Self {
+            msg: ErrorMsg::None,
+            source: Some(Box::new(e)),
+        }
+    }
+}
+
+impl From<std::str::Utf8Error> for Error {
+    fn from(e: std::str::Utf8Error) -> Self {
+        Self {
+            msg: ErrorMsg::None,
+            source: Some(Box::new(e)),
+        }
+    }
 }
 
 impl FromStr for Format {
@@ -61,38 +151,59 @@ impl FromStr for Format {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.to_lowercase().as_str() {
             "markdown" => Ok(Format::Markdown),
-            "json" => Ok(Format::Json),
-            "prettyjson" => Ok(Format::PrettyJson),
-            _ => Err("unknown format; try markdown, json, or prettyjson"),
+            _ => Err("unknown format; try markdown"),
         }
     }
 }
 
-fn main() -> Result<(), i32> {
-    let opts = Opts::parse_args_default_or_exit();
+fn verbose<F: FnOnce() -> String>(msg_fn: F) {
+    if VERBOSE.load(Relaxed) {
+        eprintln!("{}", msg_fn());
+    }
+}
 
-    let from = read_lockfile(&opts.from, &opts.path).map_err(|e| {
-        eprintln!("could not read 'from' file; {}", e);
+fn main() -> Result<(), i32> {
+    let mut args = std::env::args().collect::<Vec<_>>();
+
+    if let Some(v) = args.get(1) {
+        if v == "lock-diff" {
+            args.remove(1);
+        }
+    }
+
+    let opts = Opts::parse_args_default(&args[1..]).map_err(|e| {
+        eprintln!("{}: {}", args[0], e);
+        2
+    })?;
+
+    if opts.help {
+        println!("usage: {} [options]", args[0]);
+        println!("");
+        println!("{}", Opts::usage());
+        return Ok(());
+    }
+
+    if opts.verbose {
+        VERBOSE.store(true, Relaxed);
+    }
+
+    let from = load(&opts.from, &opts.path).map_err(|e| {
+        eprintln!("could not read 'from'; {}", e);
         1
     })?;
 
-    let to = read_lockfile(&opts.to, &opts.path).map_err(|e| {
-        eprintln!("could not read 'to' file; {}", e);
+    let to = load(&opts.to, &opts.path).map_err(|e| {
+        eprintln!("could not read 'to'; {}", e);
         1
     })?;
 
     let diff = diff(&from, &to);
 
-    let mut table = Table::new();
-
-    table.set_format(format_markdown());
-    table.set_titles(row!["Package", "From", "To"]);
-
-    for (name, changes) in diff {
-        table.add_row(row![name, changes.from, changes.to]);
+    if diff.len() > 0 {
+        print_difftable(&diff, format_markdown(), opts.links);
+    } else {
+        println!("No changes");
     }
-
-    table.printstd();
 
     Ok(())
 }
@@ -108,107 +219,30 @@ fn format_markdown() -> TableFormat {
         .build()
 }
 
-fn read_lockfile(source: &str, base: &str) -> Result<Lockfile, io::Error> {
-    let path = Path::new(base).join(source);
+fn print_difftable(diff: &Diff, format: TableFormat, links: bool) {
+    let mut table = Table::new();
 
-    if path.exists() {
-        return Ok(Lockfile::load(path).unwrap());
-    }
+    table.set_format(format);
+    table.set_titles(row!["Package", "From", "To"]);
 
-    if let Some(f) = lockfile_from_git(source, base)? {
-        return Ok(f);
-    }
-
-    // Try others
-
-    Err(io::Error::from(io::ErrorKind::NotFound))
-}
-
-fn lockfile_from_git(maybe_ref: &str, path_base: &str) -> Result<Option<Lockfile>, io::Error> {
-    let gitpath = if maybe_ref.contains(':') {
-        let parts: Vec<&str> = maybe_ref.splitn(2, ':').collect();
-        let mut path = std::path::PathBuf::new();
-        path.push(&path_base);
-        if let Some(s) = parts.get(1) {
-            path.push(s)
-        }
-        [parts[0], ":", path.to_str().unwrap()].join("")
-    } else {
-        maybe_ref.to_owned()
-    };
-
-    let output = Command::new("git").arg("show").arg(gitpath).output()?;
-
-    if !output.status.success() {
-        let e = io::Error::from_raw_os_error(output.status.code().unwrap_or(1));
-        return Err(io::Error::new(io::ErrorKind::Other, e));
-    }
-
-    from_utf8(&output.stdout)
-        .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?
-        .parse()
-        .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))
-        .map(|f| Some(f))
-}
-
-struct Changes {
-    name: String,
-    from: Version,
-    to: Version,
-}
-
-type Diff = HashMap<String, Changes>;
-
-#[derive(Debug, PartialEq)]
-enum Version {
-    New,
-    Removed,
-    At(cargo_lock::Version),
-}
-
-fn diff(from: &Lockfile, to: &Lockfile) -> Diff {
-    let mut diff = HashMap::new();
-
-    for pkg in &from.packages {
-        let changes = Changes {
-            name: pkg.name.as_str().to_owned(),
-            from: Version::At(pkg.version.clone()),
-            to: Version::Removed,
+    for (name, changes) in diff {
+        let col0 = match &changes.link {
+            Some(link) if links => format!("[{}][{}]", name, link.id),
+            _ => name.clone(),
         };
 
-        diff.insert(changes.name.clone(), changes);
+        table.add_row(row![col0, changes.from, changes.to]);
     }
 
-    for pkg in &to.packages {
-        if let Some(changes) = diff.get_mut(pkg.name.as_str()) {
-            let to = Version::At(pkg.version.clone());
-            if changes.from != to {
-                changes.to = to;
-            } else {
-                diff.remove(pkg.name.as_str());
+    table.printstd();
+
+    if links {
+        println!("");
+
+        for (_, changes) in diff {
+            if let Some(link) = &changes.link {
+                println!("[{}]: {}", link.id, link.url);
             }
-        } else {
-            let c = Changes {
-                name: pkg.name.as_str().to_owned(),
-                from: Version::New,
-                to: Version::At(pkg.version.clone()),
-            };
-
-            diff.insert(c.name.clone(), c);
-        }
-    }
-
-    diff
-}
-
-impl fmt::Display for Version {
-    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        use Version::*;
-
-        match self {
-            New => f.write_str("NEW"),
-            Removed => f.write_str("REMOVED"),
-            At(v) => v.fmt(f),
         }
     }
 }
