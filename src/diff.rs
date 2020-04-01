@@ -1,9 +1,9 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 use std::fmt;
 
 use cargo_lock::{Lockfile, Package};
 
-pub type Diff = HashMap<String, Changes>;
+pub type Diff = BTreeMap<String, Changes>;
 
 pub struct Changes {
     pub name: String,
@@ -37,7 +37,7 @@ impl fmt::Display for Version {
 }
 
 pub fn diff(from: &Lockfile, to: &Lockfile) -> Diff {
-    let mut diff = HashMap::new();
+    let mut diff = BTreeMap::new();
     let mut counter: u32 = 0;
 
     for pkg in &from.packages {
