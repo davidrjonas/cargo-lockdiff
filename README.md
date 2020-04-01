@@ -1,7 +1,7 @@
 cargo-lockdiff
 ==============
 
-See what crates have changed after you run `cargo update` by comparing Cargo.lock to the the vcs HEAD or file of your choice.
+See what crates have changed after you run `cargo update` by comparing Cargo.lock to the vcs HEAD or file of your choice.
 
 ### Dependencies
 
