@@ -3,6 +3,11 @@ name = "cargo-lockdiff"
 version = "0.1.0"
 authors = ["David Jonas <djonas@noip.com>"]
 edition = "2018"
+license = "MIT"
+keywords = ["cargo", "lock", "lockdiff", "dependency", "lockfile", "diff"]
+categories = ["command-line-utilities", "development-tools::cargo-plugins"]
+repository = "https://github.com/davidrjonas/cargo-lockdiff"
+readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
