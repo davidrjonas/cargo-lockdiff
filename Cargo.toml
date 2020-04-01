@@ -8,5 +8,6 @@ edition = "2018"
 
 [dependencies]
 argh = "0.1"
+anyhow = "1"
 cargo-lock = { version = "4", default-features = false, features = [] }
 prettytable-rs = "0.8"
