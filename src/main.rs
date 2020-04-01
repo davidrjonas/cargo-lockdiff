@@ -1,8 +1,7 @@
 use std::fmt;
-use std::str::FromStr;
 use std::sync::atomic::{AtomicBool, Ordering::Relaxed};
 
-use gumdrop::Options;
+use argh::FromArgs;
 use prettytable::{cell, format::TableFormat, row, Table};
 
 mod diff;
@@ -13,48 +12,28 @@ use load::*;
 
 static VERBOSE: AtomicBool = AtomicBool::new(false);
 
-#[derive(Debug, Options)]
+#[derive(Debug, FromArgs)]
+/// Diff your lock file, see what's changed.
 struct Opts {
-    #[options(help = "Print help message")]
-    help: bool,
-
-    #[options(
-        //default = "",
-        help = "Base to with which to prefix paths. E.g. `-p app` would look for HEAD:app/Cargo.lock and app/Cargo.lock"
-    )]
+    /// base to with which to prefix paths. E.g. `-p app` would look for HEAD:app/Cargo.lock and app/Cargo.lock
+    #[argh(option, short = 'p', default = r#""".into()"#)]
     path: String,
 
-    #[options(
-        no_short,
-        default = "HEAD",
-        help = "The  file, git ref, or git ref with filename to compare from."
-    )]
+    /// the file, git ref, or git ref with filename to compare from
+    #[argh(option, default = r#""HEAD".into()"#)]
     from: String,
 
-    #[options(
-        no_short,
-        help = "The file, git ref, or git ref with filename to compare to."
-    )]
+    /// the file, git ref, or git ref with filename to compare to
+    #[argh(option, default = r#""".into()"#)]
     to: String,
 
-    // #[options(no_short, help = "Only include changes from `dependencies`")]
-    // only_prod: bool,
-
-    // #[options(no_short, help = "Only include changes from `dev-dependencies`")]
-    // only_dev: bool,
-    #[options(short = "l", help = "Include links to where possible")]
+    /// include links to where possible
+    #[argh(switch, short = 'l')]
     links: bool,
 
-    #[options(short = "f", default = "markdown", help = "Output format: markdown")]
-    format: Format,
-
-    #[options(short = "v", help = "Show some extra messages")]
+    /// show some extra messages
+    #[argh(switch, short = 'v')]
     verbose: bool,
-}
-
-#[derive(Debug)]
-enum Format {
-    Markdown,
 }
 
 #[derive(Debug, PartialEq)]
@@ -145,17 +124,6 @@ impl From<std::str::Utf8Error> for Error {
     }
 }
 
-impl FromStr for Format {
-    type Err = &'static str;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.to_lowercase().as_str() {
-            "markdown" => Ok(Format::Markdown),
-            _ => Err("unknown format; try markdown"),
-        }
-    }
-}
-
 fn verbose<F: FnOnce() -> String>(msg_fn: F) {
     if VERBOSE.load(Relaxed) {
         eprintln!("{}", msg_fn());
@@ -163,25 +131,10 @@ fn verbose<F: FnOnce() -> String>(msg_fn: F) {
 }
 
 fn main() -> Result<(), i32> {
-    let mut args = std::env::args().collect::<Vec<_>>();
-
-    if let Some(v) = args.get(1) {
-        if v == "lock-diff" {
-            args.remove(1);
-        }
-    }
-
-    let opts = Opts::parse_args_default(&args[1..]).map_err(|e| {
-        eprintln!("{}: {}", args[0], e);
-        2
-    })?;
-
-    if opts.help {
-        println!("usage: {} [options]", args[0]);
-        println!("");
-        println!("{}", Opts::usage());
-        return Ok(());
-    }
+    let opts: Opts = match std::env::args().nth(1) {
+        Some(arg) if arg == "lockdiff" => argh::cargo_from_env(),
+        _ => argh::from_env(),
+    };
 
     if opts.verbose {
         VERBOSE.store(true, Relaxed);
@@ -200,7 +153,7 @@ fn main() -> Result<(), i32> {
     let diff = diff(&from, &to);
 
     if diff.len() > 0 {
-        print_difftable(&diff, format_markdown(), opts.links);
+        print_markdown(&diff, opts.links);
     } else {
         println!("No changes");
     }
@@ -219,7 +172,9 @@ fn format_markdown() -> TableFormat {
         .build()
 }
 
-fn print_difftable(diff: &Diff, format: TableFormat, links: bool) {
+fn print_markdown(diff: &Diff, links: bool) {
+    let format = format_markdown();
+
     let mut table = Table::new();
 
     table.set_format(format);
