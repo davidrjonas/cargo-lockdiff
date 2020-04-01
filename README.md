@@ -9,55 +9,78 @@ Example
 ### Raw
 
 ```
-$ cargo lockdiff --links
+$ cargo lockdiff --from "HEAD@{2 months ago}" --links
 
-| Package                    | From  | To      |
-|----------------------------|-------|---------|
-| cargo-lock-diff            | 0.1.0 | REMOVED |
-| [anyhow][53]               | NEW   | 1.0.28  |
-| [gumdrop_derive][19]       | 0.7.0 | REMOVED |
-| [unicode-segmentation][59] | NEW   | 1.6.0   |
-| [argh][54]                 | NEW   | 0.1.3   |
-| [argh_derive][55]          | NEW   | 0.1.1   |
-| [argh_shared][56]          | NEW   | 0.1.1   |
-| [heck][58]                 | NEW   | 0.3.1   |
-| [gumdrop][18]              | 0.7.0 | REMOVED |
-| cargo-lockdiff             | NEW   | 0.1.0   |
+| Package                       | From    | To                           |
+|-------------------------------|---------|------------------------------|
+| [tracing][242]                | 0.1.10  | 0.1.13                       |
+| [pin-project-lite][313]       | NEW     | 0.1.4                        |
+| [tracing-subscriber][331]     | NEW     | 0.2.3                        |
+| [flate2][71]                  | 1.0.13  | 1.0.14                       |
+| [actix-web][12]               | 1.0.9   | 2.0.0                        |
+| [chrono][44]                  | 0.4.10  | 0.4.11                       |
+| [enum-as-inner][67]           | 0.2.1   | 0.3.2                        |
+| [ryu][196]                    | 1.0.2   | 1.0.3                        |
+| [pin-project-internal][312]   | NEW     | 0.4.8                        |
+| [tokio-signal][235]           | 0.2.7   | REMOVED                      |
+| [proc-macro2][159]            | 1.0.6   | 1.0.9                        |
+| [crossbeam-utils][54]         | 0.7.0   | 0.7.2                        |
+| [lock_api][112]               | 0.3.2   | 0.3.3                        |
+| [rust-embed-impl][190]        | 5.1.0   | 5.5.1                        |
+| [tokio-current-thread][230]   | 0.1.6   | 0.1.7                        |
 
-[53]: https://crates.io/crates/anyhow
-[19]: https://crates.io/crates/gumdrop_derive
-[59]: https://crates.io/crates/unicode-segmentation
-[54]: https://crates.io/crates/argh
-[55]: https://crates.io/crates/argh_derive
-[56]: https://crates.io/crates/argh_shared
-[58]: https://crates.io/crates/heck
-[18]: https://crates.io/crates/gumdrop
+[242]: https://crates.io/crates/tracing
+[313]: https://crates.io/crates/pin-project-lite
+[331]: https://crates.io/crates/tracing-subscriber
+[71]: https://crates.io/crates/flate2
+[12]: https://crates.io/crates/actix-web
+[44]: https://crates.io/crates/chrono
+[67]: https://crates.io/crates/enum-as-inner
+[196]: https://crates.io/crates/ryu
+[312]: https://crates.io/crates/pin-project-internal
+[235]: https://crates.io/crates/tokio-signal
+[159]: https://crates.io/crates/proc-macro2
+[54]: https://crates.io/crates/crossbeam-utils
+[112]: https://crates.io/crates/lock_api
+[190]: https://crates.io/crates/rust-embed-impl
+[230]: https://crates.io/crates/tokio-current-thread
 ```
 
 ### Rendered
 
-| Package                    | From  | To      |
-|----------------------------|-------|---------|
-| cargo-lock-diff            | 0.1.0 | REMOVED |
-| [anyhow][53]               | NEW   | 1.0.28  |
-| [gumdrop_derive][19]       | 0.7.0 | REMOVED |
-| [unicode-segmentation][59] | NEW   | 1.6.0   |
-| [argh][54]                 | NEW   | 0.1.3   |
-| [argh_derive][55]          | NEW   | 0.1.1   |
-| [argh_shared][56]          | NEW   | 0.1.1   |
-| [heck][58]                 | NEW   | 0.3.1   |
-| [gumdrop][18]              | 0.7.0 | REMOVED |
-| cargo-lockdiff             | NEW   | 0.1.0   |
+| Package                       | From    | To                           |
+|-------------------------------|---------|------------------------------|
+| [tracing][242]                | 0.1.10  | 0.1.13                       |
+| [pin-project-lite][313]       | NEW     | 0.1.4                        |
+| [tracing-subscriber][331]     | NEW     | 0.2.3                        |
+| [flate2][71]                  | 1.0.13  | 1.0.14                       |
+| [actix-web][12]               | 1.0.9   | 2.0.0                        |
+| [chrono][44]                  | 0.4.10  | 0.4.11                       |
+| [enum-as-inner][67]           | 0.2.1   | 0.3.2                        |
+| [ryu][196]                    | 1.0.2   | 1.0.3                        |
+| [pin-project-internal][312]   | NEW     | 0.4.8                        |
+| [tokio-signal][235]           | 0.2.7   | REMOVED                      |
+| [proc-macro2][159]            | 1.0.6   | 1.0.9                        |
+| [crossbeam-utils][54]         | 0.7.0   | 0.7.2                        |
+| [lock_api][112]               | 0.3.2   | 0.3.3                        |
+| [rust-embed-impl][190]        | 5.1.0   | 5.5.1                        |
+| [tokio-current-thread][230]   | 0.1.6   | 0.1.7                        |
 
-[53]: https://crates.io/crates/anyhow
-[19]: https://crates.io/crates/gumdrop_derive
-[59]: https://crates.io/crates/unicode-segmentation
-[54]: https://crates.io/crates/argh
-[55]: https://crates.io/crates/argh_derive
-[56]: https://crates.io/crates/argh_shared
-[58]: https://crates.io/crates/heck
-[18]: https://crates.io/crates/gumdrop
-
+[242]: https://crates.io/crates/tracing
+[313]: https://crates.io/crates/pin-project-lite
+[331]: https://crates.io/crates/tracing-subscriber
+[71]: https://crates.io/crates/flate2
+[12]: https://crates.io/crates/actix-web
+[44]: https://crates.io/crates/chrono
+[67]: https://crates.io/crates/enum-as-inner
+[196]: https://crates.io/crates/ryu
+[312]: https://crates.io/crates/pin-project-internal
+[235]: https://crates.io/crates/tokio-signal
+[159]: https://crates.io/crates/proc-macro2
+[54]: https://crates.io/crates/crossbeam-utils
+[112]: https://crates.io/crates/lock_api
+[190]: https://crates.io/crates/rust-embed-impl
+[230]: https://crates.io/crates/tokio-current-thread
 
 Install
 -------
@@ -106,3 +129,4 @@ Todo
 - [ ] Http source
 - [ ] Research other popular rust VCSs, add them.
 - [ ] Output formats such as JSON
+- [ ] "compare versions" links
