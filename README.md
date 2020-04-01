@@ -3,47 +3,8 @@ cargo-lockdiff
 
 See what crates have changed after you run `cargo update` by comparing Cargo.lock to the vcs HEAD or file of your choice.
 
-### Dependencies
-
-To use `git` or `hg` the respective binary must be found in `PATH`.
-
-Install
+Example
 -------
-
-```bash
-cargo install cargo-lockdiff
-
-# try it
-cargo lockdiff --help
-```
-
-Usage
------
-
-```bash
-cargo update
-# don't commit yet!
-cargo lockdiff
-```
-
-Or from vim, to insert the output into the commit message, type `:r!cargo lockdiff`.
-
-To see what changed long ago (in git),
-
-```bash
-cargo lockdiff --from "HEAD@{2 months ago}"
-```
-
-### Options
-
-- `-p, --path <path>`: Base to with which to prefix paths. E.g. `-p app` would look for HEAD:app/Cargo.lock and app/Cargo.lock
-- `--from <fileish>`: The file, vcs ref, or vcs ref with filename to compare from.  To force the use of a particular vcs, prepend it with a colon. E.g. "hg:."
-- `--to <fileish>`: The file, vcs ref, or vcs ref with filename to compare to.  To force the use of a particular vcs, prepend it with a colon. E.g. "hg:."
-- `-l, --links`: Include links to where possible
-- `--help`: Display usage information
-
-Example Output
---------------
 
 ### Raw
 
@@ -96,6 +57,47 @@ $ cargo lockdiff --links
 [56]: https://crates.io/crates/argh_shared
 [58]: https://crates.io/crates/heck
 [18]: https://crates.io/crates/gumdrop
+
+
+Install
+-------
+
+```bash
+cargo install cargo-lockdiff
+
+# try it
+cargo lockdiff --help
+```
+
+### Dependencies
+
+To use `git` or `hg` the respective binary must be found in `PATH`.
+
+
+Usage
+-----
+
+```bash
+cargo update
+# don't commit yet!
+cargo lockdiff
+```
+
+Or from vim, to insert the output into the commit message, type `:r!cargo lockdiff`.
+
+To see what changed long ago (in git),
+
+```bash
+cargo lockdiff --from "HEAD@{2 months ago}"
+```
+
+### Options
+
+- `-p, --path <path>`: Base to with which to prefix paths. E.g. `-p app` would look for HEAD:app/Cargo.lock and app/Cargo.lock
+- `--from <fileish>`: The file, vcs ref, or vcs ref with filename to compare from.  To force the use of a particular vcs, prepend it with a colon. E.g. "hg:."
+- `--to <fileish>`: The file, vcs ref, or vcs ref with filename to compare to.  To force the use of a particular vcs, prepend it with a colon. E.g. "hg:."
+- `-l, --links`: Include links to where possible
+- `--help`: Display usage information
 
 Todo
 ----
