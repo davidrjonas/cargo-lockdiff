@@ -3,13 +3,12 @@ cargo-lockdiff
 
 See what crates have changed after you run `cargo update` by comparing Cargo.lock to the the vcs HEAD or file of your choice.
 
-Dependencies
-------------
+### Dependencies
 
 To use `git` or `hg` the respective binary must be found in `PATH`.
 
 Install
-=======
+-------
 
 ```bash
 cargo install cargo-lockdiff
@@ -19,7 +18,7 @@ cargo lockdiff --help
 ```
 
 Usage
-=====
+-----
 
 ```bash
 cargo update
@@ -35,8 +34,7 @@ To see what changed long ago (in git),
 cargo lockdiff --from "HEAD@{2 months ago}"
 ```
 
-Options
--------
+### Options
 
 - `-p, --path <path>`: Base to with which to prefix paths. E.g. `-p app` would look for HEAD:app/Cargo.lock and app/Cargo.lock
 - `--from <fileish>`: The file, vcs ref, or vcs ref with filename to compare from.  To force the use of a particular vcs, prepend it with a colon. E.g. "hg:."
@@ -45,10 +43,9 @@ Options
 - `--help`: Display usage information
 
 Example Output
-==============
+--------------
 
-Raw
----
+### Raw
 
 ```
 $ cargo lockdiff --links
@@ -76,8 +73,7 @@ $ cargo lockdiff --links
 [18]: https://crates.io/crates/gumdrop
 ```
 
-Rendered
---------
+### Rendered
 
 | Package                    | From  | To      |
 |----------------------------|-------|---------|
