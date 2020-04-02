@@ -1,5 +1,4 @@
 use anyhow::{anyhow, Result};
-use argh::FromArgs;
 use prettytable::{cell, row, Table};
 
 mod diff;
@@ -8,36 +7,27 @@ mod load;
 use diff::*;
 use load::*;
 
-#[derive(Debug, FromArgs)]
-/// Diff your lock file, see what's changed.
+#[derive(Debug)]
 struct Opts {
     /// base to with which to prefix paths. E.g. `-p app` would look for HEAD:app/Cargo.lock and app/Cargo.lock
-    #[argh(option, short = 'p', default = r#""".into()"#)]
     path: String,
 
     /// the file, vcs ref, or vcs ref with filename to compare from. To force the use of a
     /// particular vcs, prepend it with a colon. E.g. "hg:.". The ref is required if the vcs is
     /// specified.
-    #[argh(option, default = r#""HEAD".into()"#)]
     from: String,
 
     /// the file, vcs ref, or vcs ref with filename to compare to. To force the use of a
     /// particular vcs, prepend it with a colon. E.g. "hg:.". The ref is required if the vcs is
     /// specified.
-    #[argh(option, default = r#""".into()"#)]
     to: String,
 
-    /// include links to where possible
-    #[argh(switch, short = 'l')]
-    links: bool,
+    /// do not include links
+    no_links: bool,
 }
 
-fn main() -> Result<()> {
-    let opts: Opts = match std::env::args().nth(1) {
-        Some(arg) if arg == "lockdiff" => argh::cargo_from_env(),
-        _ => argh::from_env(),
-    };
-
+#[paw::main]
+fn main(opts: Opts) -> Result<()> {
     let (from_sources, from_fileish) = parse_source_opt(&opts.from);
 
     let from = load(&from_sources, from_fileish, &opts.path)
@@ -51,7 +41,7 @@ fn main() -> Result<()> {
     let diff = diff(&from, &to);
 
     if diff.len() > 0 {
-        print_markdown(&diff, opts.links);
+        print_markdown(&diff, !opts.no_links);
     } else {
         println!("No changes");
     }
@@ -112,5 +102,78 @@ fn print_markdown(diff: &Diff, links: bool) {
                 println!("[{}]: {}", link.id, link.url);
             }
         }
+    }
+}
+
+fn print_help() {
+    println!(
+        r#"Usage: cargo lockdiff [-p <path>] [--from <from>] [--to <to>] [-l]
+
+Diff your lock file, see what's changed. Use these options or environment variables prefixed with
+`CARGO_LOCKDIFF_`, such as `CARGO_LOCKDIFF_NO_LINKS=true`.
+
+Options:
+  -p, --path        Base to with which to prefix paths. E.g. `-p app` would look
+                    for HEAD:app/Cargo.lock and app/Cargo.lock. Env: CARGO_LOCKDIFF_PATH
+
+  --from            The file, vcs ref, or vcs ref with filename to compare from.
+                    To force the use of a particular vcs, prepend it with a
+                    colon. E.g. "hg:.". The ref is required if the vcs is
+                    specified. Env: CARGO_LOCKDIFF_FROM
+
+  --to              The file, vcs ref, or vcs ref with filename to compare to.
+                    To force the use of a particular vcs, prepend it with a
+                    colon. E.g. "hg:.". The ref is required if the vcs is
+                    specified. Env: CARGO_LOCKDIFF_TO
+
+  -n, --no-links    Include links to where possible. Env: CARGO_LOCKDIFF_NO_LINKS
+
+  -h, --help        Display usage information
+    "#
+    );
+
+    std::process::exit(0);
+}
+
+impl paw::ParseArgs for Opts {
+    type Error = anyhow::Error;
+
+    fn parse_args() -> Result<Self, Self::Error> {
+        use std::env;
+
+        let mut args = env::args().skip(1);
+
+        let mut opts = Opts {
+            path: env::var("CARGO_LOCKDIFF_PATH").unwrap_or_default(),
+            from: env::var("CARGO_LOCKDIFF_FROM").unwrap_or("HEAD".into()),
+            to: env::var("CARGO_LOCKDIFF_TO").unwrap_or_default(),
+            no_links: env::var("CARGO_LOCKDIFF_NO_LINKS")
+                .map(|v| v.parse().unwrap_or(false))
+                .unwrap_or(false),
+        };
+
+        while let Some(arg) = args.next() {
+            match arg.as_str() {
+                "lockdiff" => {}
+                "-p" | "--path" => {
+                    opts.path = args.next().ok_or_else(|| anyhow!("expected path"))?
+                }
+                "--to" => {
+                    opts.to = args
+                        .next()
+                        .ok_or_else(|| anyhow!("expected 'to' fileish"))?
+                }
+                "--from" => {
+                    opts.from = args
+                        .next()
+                        .ok_or_else(|| anyhow!("expected 'from' fileish"))?
+                }
+                "-n" | "--no-links" => opts.no_links = true,
+                "-h" | "--help" => print_help(),
+                arg => return Err(anyhow!("Unknown argument '{}'", arg)),
+            }
+        }
+
+        Ok(opts)
     }
 }

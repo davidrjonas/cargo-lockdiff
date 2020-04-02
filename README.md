@@ -116,15 +116,21 @@ cargo lockdiff --from "HEAD@{2 months ago}"
 
 ### Options
 
-- `-p, --path <path>`: Base to with which to prefix paths. E.g. `-p app` would look for HEAD:app/Cargo.lock and app/Cargo.lock
-- `--from <fileish>`: The file, vcs ref, or vcs ref with filename to compare from.  To force the use of a particular vcs, prepend it with a colon. E.g. "hg:."
-- `--to <fileish>`: The file, vcs ref, or vcs ref with filename to compare to.  To force the use of a particular vcs, prepend it with a colon. E.g. "hg:."
-- `-l, --links`: Include links to where possible
+Environment variables prefixed with `CARGO_LOCKDIFF_`, such as `CARGO_LOCKDIFF_NO_LINKS=true`, may also be used. Set these in your `~/.profile` (specific to your shell, of course) as defaults.
+
+- `-p, --path <path>`: Base to with which to prefix paths. E.g. `-p app` would look for HEAD:app/Cargo.lock and app/Cargo.lock. Env: `CARGO_LOCKDIFF_PATH`
+- `--from <fileish>`: The file, vcs ref, or vcs ref with filename to compare from.  To force the use of a particular vcs, prepend it with a colon. E.g. "hg:." Env: `CARGO_LOCKDIFF_FROM`
+
+- `--to <fileish>`: The file, vcs ref, or vcs ref with filename to compare to.  To force the use of a particular vcs, prepend it with a colon. E.g. "hg:." Env: `CARGO_LOCKDIFF_TO`
+
+- `-l, --links`: Include links to where possible. Env: `CARGO_LOCKDIFF_NO_LINKS` ("true" or "false")
+
 - `--help`: Display usage information
 
 Todo
 ----
 
+- [ ] Handle manifest-path, https://docs.rs/cargo_metadata/0.9.1/cargo_metadata/4
 - [ ] Test fixtures
 - [ ] Http source
 - [ ] Research other popular rust VCSs, add them.
