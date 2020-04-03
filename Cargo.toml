@@ -1,6 +1,6 @@
 [package]
 name = "cargo-lockdiff"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["David Jonas <djonas@noip.com>"]
 edition = "2018"
 license = "MIT"
@@ -17,3 +17,4 @@ anyhow = "1"
 cargo-lock = { version = "4", default-features = false, features = [] }
 paw = "1"
 prettytable-rs = "0.8"
+serde_json = "1"
