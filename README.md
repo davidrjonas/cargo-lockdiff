@@ -148,6 +148,13 @@ Environment variables prefixed with `CARGO_LOCKDIFF_`, such as `CARGO_LOCKDIFF_N
 
 - `--help`: Display usage information
 
+Compare Urls
+------------
+
+Compare urls are best effort. Unfortunately there is no strict mapping between crate version numbers and VCS tags so the URLs are just guesses. There doesn't seem to be much consistency. Many maintainers seem to prefix their version number tags with a "v" or, for larger projects, the names of individual crates. If anyone has ideas on how to solve improve it I'd love to try some out.
+
+Currently only Github is supported. Others will be added.
+
 Todo
 ----
 
