@@ -13,7 +13,7 @@ Example
 ### Raw
 
 ```
-$ cargo lockdiff --from "HEAD@{2 months ago}" --links
+$ cargo lockdiff --from "HEAD@{2 months ago}"
 
 | Package                      | From    | To                           | Compare    |
 |------------------------------|---------|------------------------------|------------|
@@ -144,7 +144,7 @@ Environment variables prefixed with `CARGO_LOCKDIFF_`, such as `CARGO_LOCKDIFF_N
 
 - `--to <fileish>`: The file, vcs ref, or vcs ref with filename to compare to.  To force the use of a particular vcs, prepend it with a colon. E.g. "hg:." Env: `CARGO_LOCKDIFF_TO`
 
-- `-l, --links`: Include links to where possible. Env: `CARGO_LOCKDIFF_NO_LINKS` ("true" or "false")
+- `-n, --no-links`: Include links to where possible. Env: `CARGO_LOCKDIFF_NO_LINKS` ("true" or "false")
 
 - `--help`: Display usage information
 
