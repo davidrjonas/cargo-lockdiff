@@ -113,7 +113,7 @@ impl StringFromExt for serde_json::Map<String, Value> {
     }
 }
 
-pub fn load_metadata<'a>() -> Result<Metadata, Error> {
+pub fn load_metadata() -> Result<Metadata, Error> {
     let mut metadata = HashMap::new();
 
     let output = Command::new("cargo")

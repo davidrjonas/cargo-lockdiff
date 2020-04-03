@@ -1,6 +1,7 @@
 ### [Unreleased]
 
 - Update: a little code refactor
+- Update: improve env var errors
 
 ### [0.2.0] - 2020-02-03
 

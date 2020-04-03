@@ -43,7 +43,7 @@ fn main(opts: Opts) -> Result<()> {
 
     let diff = diff(&from, &to);
 
-    if diff.len() > 0 {
+    if diff.is_empty() {
         if opts.no_links {
             print_markdown_no_links(&diff);
         } else {
@@ -149,7 +149,7 @@ fn print_markdown(diff: &Diff, metadata: Metadata) {
 
     table.printstd();
 
-    println!("");
+    println!();
 
     for (id, url) in linked {
         println!("[{:02X}]: {}", id, url);
@@ -195,11 +195,11 @@ impl paw::ParseArgs for Opts {
         let mut args = env::args().skip(1);
 
         let mut opts = Opts {
-            path: env::var("CARGO_LOCKDIFF_PATH").unwrap_or_default(),
-            from: env::var("CARGO_LOCKDIFF_FROM").unwrap_or("HEAD".into()),
-            to: env::var("CARGO_LOCKDIFF_TO").unwrap_or_default(),
-            no_links: env::var("CARGO_LOCKDIFF_NO_LINKS")
-                .map(|v| v.parse().unwrap_or(false))
+            path: get_env("CARGO_LOCKDIFF_PATH", || "")?,
+            from: get_env("CARGO_LOCKDIFF_FROM", || "HEAD")?,
+            to: get_env("CARGO_LOCKDIFF_TO", || "")?,
+            no_links: get_env("CARGO_LOCKDIFF_NO_LINKS", || "")?
+                .parse()
                 .unwrap_or(false),
         };
 
@@ -226,5 +226,17 @@ impl paw::ParseArgs for Opts {
         }
 
         Ok(opts)
+    }
+}
+
+fn get_env<T, F>(key: &'static str, default: F) -> Result<String>
+where
+    F: FnOnce() -> T,
+    T: Into<String>,
+{
+    match std::env::var(key) {
+        Ok(v) => Ok(v),
+        Err(std::env::VarError::NotPresent) => Ok(default().into()),
+        Err(e) => Err(anyhow::Error::new(e).context(key)),
     }
 }

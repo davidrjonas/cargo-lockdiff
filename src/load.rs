@@ -61,7 +61,7 @@ impl std::error::Error for LoadError {}
 impl fmt::Display for LoadError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for e in &self.errors {
-            writeln!(f, "")?;
+            writeln!(f)?;
             write!(f, "  {:#}", e)?;
         }
 
