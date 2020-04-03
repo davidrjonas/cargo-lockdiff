@@ -15,76 +15,94 @@ Example
 ```
 $ cargo lockdiff --from "HEAD@{2 months ago}" --links
 
-| Package                       | From    | To                           |
-|-------------------------------|---------|------------------------------|
-| [actix-web][12]               | 1.0.9   | 2.0.0                        |
-| [chrono][44]                  | 0.4.10  | 0.4.11                       |
-| [crossbeam-utils][54]         | 0.7.0   | 0.7.2                        |
-| [enum-as-inner][67]           | 0.2.1   | 0.3.2                        |
-| [flate2][71]                  | 1.0.13  | 1.0.14                       |
-| [lock_api][112]               | 0.3.2   | 0.3.3                        |
-| [pin-project-internal][312]   | NEW     | 0.4.8                        |
-| [pin-project-lite][313]       | NEW     | 0.1.4                        |
-| [proc-macro2][159]            | 1.0.6   | 1.0.9                        |
-| [rust-embed-impl][190]        | 5.1.0   | 5.5.1                        |
-| [ryu][196]                    | 1.0.2   | 1.0.3                        |
-| [tokio-current-thread][230]   | 0.1.6   | 0.1.7                        |
-| [tokio-signal][235]           | 0.2.7   | REMOVED                      |
-| [tracing-subscriber][331]     | NEW     | 0.2.3                        |
-| [tracing][242]                | 0.1.10  | 0.1.13                       |
+| Package                      | From    | To                           | Compare    |
+|------------------------------|---------|------------------------------|------------|
+| [serde_json][C6]             | 1.0.42  | 1.0.48                       | [...][C7]  |
+| [sha2][C8]                   | 0.8.0   | 0.8.1                        | [...][C9]  |
+| [sharded-slab][CA]           | NEW     | 0.0.8                        |            |
+| signal-hook                  | 0.1.12  | REMOVED                      |            |
+| [smallvec][CB]               | 1.0.0   | 1.2.0                        | [...][CC]  |
+| spin                         | 0.5.2   | REMOVED                      |            |
+| string                       | 0.2.1   | REMOVED                      |            |
+| [strum][CD]                  | NEW     | 0.18.0                       |            |
+| [strum_macros][CE]           | NEW     | 0.18.0                       |            |
+| [syn][CF]                    | 1.0.11  | 1.0.17                       | [...][D0]  |
+| [thiserror][D2]              | NEW     | 1.0.13                       |            |
+| [thiserror-impl][D3]         | NEW     | 1.0.13                       |            |
+| [thread_local][D4]           | NEW     | 1.0.1                        |            |
+| [tokio][D5]                  | NEW     | 0.2.13                       |            |
+| [tokio-codec][D6]            | 0.1.1   | 0.1.2                        | [...][D7]  |
+| tokio-signal                 | 0.2.7   | REMOVED                      |            |
+| [tracing][F1]                | 0.1.10  | 0.1.13                       | [...][F2]  |
+| [tracing-attributes][F3]     | 0.1.5   | 0.1.7                        | [...][F4]  |
 
-[12]: https://crates.io/crates/actix-web
-[44]: https://crates.io/crates/chrono
-[54]: https://crates.io/crates/crossbeam-utils
-[67]: https://crates.io/crates/enum-as-inner
-[71]: https://crates.io/crates/flate2
-[112]: https://crates.io/crates/lock_api
-[312]: https://crates.io/crates/pin-project-internal
-[313]: https://crates.io/crates/pin-project-lite
-[159]: https://crates.io/crates/proc-macro2
-[190]: https://crates.io/crates/rust-embed-impl
-[196]: https://crates.io/crates/ryu
-[230]: https://crates.io/crates/tokio-current-thread
-[235]: https://crates.io/crates/tokio-signal
-[331]: https://crates.io/crates/tracing-subscriber
-[242]: https://crates.io/crates/tracing
+[C6]: https://crates.io/crates/serde_json
+[C7]: https://github.com/serde-rs/json/compare/1%2E0%2E48...1%2E0%2E42
+[C8]: https://crates.io/crates/sha2
+[C9]: https://github.com/RustCrypto/hashes/compare/0%2E8%2E1...0%2E8%2E0
+[CA]: https://crates.io/crates/sharded-slab
+[CB]: https://crates.io/crates/smallvec
+[CC]: https://github.com/servo/rust-smallvec/compare/1%2E2%2E0...1%2E0%2E0
+[CD]: https://crates.io/crates/strum
+[CE]: https://crates.io/crates/strum_macros
+[CF]: https://crates.io/crates/syn
+[D0]: https://github.com/dtolnay/syn/compare/1%2E0%2E17...1%2E0%2E11
+[D2]: https://crates.io/crates/thiserror
+[D3]: https://crates.io/crates/thiserror-impl
+[D4]: https://crates.io/crates/thread_local
+[D5]: https://crates.io/crates/tokio
+[D6]: https://crates.io/crates/tokio-codec
+[D7]: https://github.com/tokio-rs/tokio/compare/0%2E1%2E2...0%2E1%2E1
+[F1]: https://crates.io/crates/tracing
+[F2]: https://github.com/tokio-rs/tracing/compare/0%2E1%2E13...0%2E1%2E10
+[F3]: https://crates.io/crates/tracing-attributes
+[F4]: https://github.com/tokio-rs/tracing/compare/0%2E1%2E7...0%2E1%2E5
 ```
 
 ### Rendered
 
-| Package                       | From    | To                           |
-|-------------------------------|---------|------------------------------|
-| [tracing][242]                | 0.1.10  | 0.1.13                       |
-| [pin-project-lite][313]       | NEW     | 0.1.4                        |
-| [tracing-subscriber][331]     | NEW     | 0.2.3                        |
-| [flate2][71]                  | 1.0.13  | 1.0.14                       |
-| [actix-web][12]               | 1.0.9   | 2.0.0                        |
-| [chrono][44]                  | 0.4.10  | 0.4.11                       |
-| [enum-as-inner][67]           | 0.2.1   | 0.3.2                        |
-| [ryu][196]                    | 1.0.2   | 1.0.3                        |
-| [pin-project-internal][312]   | NEW     | 0.4.8                        |
-| [tokio-signal][235]           | 0.2.7   | REMOVED                      |
-| [proc-macro2][159]            | 1.0.6   | 1.0.9                        |
-| [crossbeam-utils][54]         | 0.7.0   | 0.7.2                        |
-| [lock_api][112]               | 0.3.2   | 0.3.3                        |
-| [rust-embed-impl][190]        | 5.1.0   | 5.5.1                        |
-| [tokio-current-thread][230]   | 0.1.6   | 0.1.7                        |
+| Package                      | From    | To                           | Compare    |
+|------------------------------|---------|------------------------------|------------|
+| [serde_json][C6]             | 1.0.42  | 1.0.48                       | [...][C7]  |
+| [sha2][C8]                   | 0.8.0   | 0.8.1                        | [...][C9]  |
+| [sharded-slab][CA]           | NEW     | 0.0.8                        |            |
+| signal-hook                  | 0.1.12  | REMOVED                      |            |
+| [smallvec][CB]               | 1.0.0   | 1.2.0                        | [...][CC]  |
+| spin                         | 0.5.2   | REMOVED                      |            |
+| string                       | 0.2.1   | REMOVED                      |            |
+| [strum][CD]                  | NEW     | 0.18.0                       |            |
+| [strum_macros][CE]           | NEW     | 0.18.0                       |            |
+| [syn][CF]                    | 1.0.11  | 1.0.17                       | [...][D0]  |
+| [thiserror][D2]              | NEW     | 1.0.13                       |            |
+| [thiserror-impl][D3]         | NEW     | 1.0.13                       |            |
+| [thread_local][D4]           | NEW     | 1.0.1                        |            |
+| [tokio][D5]                  | NEW     | 0.2.13                       |            |
+| [tokio-codec][D6]            | 0.1.1   | 0.1.2                        | [...][D7]  |
+| tokio-signal                 | 0.2.7   | REMOVED                      |            |
+| [tracing][F1]                | 0.1.10  | 0.1.13                       | [...][F2]  |
+| [tracing-attributes][F3]     | 0.1.5   | 0.1.7                        | [...][F4]  |
 
-[242]: https://crates.io/crates/tracing
-[313]: https://crates.io/crates/pin-project-lite
-[331]: https://crates.io/crates/tracing-subscriber
-[71]: https://crates.io/crates/flate2
-[12]: https://crates.io/crates/actix-web
-[44]: https://crates.io/crates/chrono
-[67]: https://crates.io/crates/enum-as-inner
-[196]: https://crates.io/crates/ryu
-[312]: https://crates.io/crates/pin-project-internal
-[235]: https://crates.io/crates/tokio-signal
-[159]: https://crates.io/crates/proc-macro2
-[54]: https://crates.io/crates/crossbeam-utils
-[112]: https://crates.io/crates/lock_api
-[190]: https://crates.io/crates/rust-embed-impl
-[230]: https://crates.io/crates/tokio-current-thread
+[C6]: https://crates.io/crates/serde_json
+[C7]: https://github.com/serde-rs/json/compare/1%2E0%2E48...1%2E0%2E42
+[C8]: https://crates.io/crates/sha2
+[C9]: https://github.com/RustCrypto/hashes/compare/0%2E8%2E1...0%2E8%2E0
+[CA]: https://crates.io/crates/sharded-slab
+[CB]: https://crates.io/crates/smallvec
+[CC]: https://github.com/servo/rust-smallvec/compare/1%2E2%2E0...1%2E0%2E0
+[CD]: https://crates.io/crates/strum
+[CE]: https://crates.io/crates/strum_macros
+[CF]: https://crates.io/crates/syn
+[D0]: https://github.com/dtolnay/syn/compare/1%2E0%2E17...1%2E0%2E11
+[D2]: https://crates.io/crates/thiserror
+[D3]: https://crates.io/crates/thiserror-impl
+[D4]: https://crates.io/crates/thread_local
+[D5]: https://crates.io/crates/tokio
+[D6]: https://crates.io/crates/tokio-codec
+[D7]: https://github.com/tokio-rs/tokio/compare/0%2E1%2E2...0%2E1%2E1
+[F1]: https://crates.io/crates/tracing
+[F2]: https://github.com/tokio-rs/tracing/compare/0%2E1%2E13...0%2E1%2E10
+[F3]: https://crates.io/crates/tracing-attributes
+[F4]: https://github.com/tokio-rs/tracing/compare/0%2E1%2E7...0%2E1%2E5
 
 Install
 -------
@@ -98,8 +116,7 @@ cargo lockdiff --help
 
 ### Dependencies
 
-To use `git` or `hg` the respective binary must be found in `PATH`.
-
+To use `git` or `hg` the respective binary must be found in `PATH`. `cargo metadata` is needed for links.
 
 Usage
 -----
@@ -139,4 +156,3 @@ Todo
 - [ ] Http source
 - [ ] Research other popular rust VCSs, add them.
 - [ ] Output formats such as JSON
-- [ ] "compare versions" links
