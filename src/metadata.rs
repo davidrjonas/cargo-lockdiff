@@ -30,8 +30,8 @@ impl MetadataEntry {
             Github => Some(format!(
                 "{}/compare/{}...{}",
                 self.repo.url.trim_end_matches(".git"),
-                urlencode(to.as_ref()),
-                urlencode(from.as_ref())
+                urlencode(from.as_ref()),
+                urlencode(to.as_ref())
             )),
         }
     }
