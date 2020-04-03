@@ -1,5 +1,7 @@
 ### [Unreleased]
 
+- Update: a little code refactor
+
 ### [0.2.0] - 2020-02-03
 
 - Add: Compare links

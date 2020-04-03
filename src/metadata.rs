@@ -5,16 +5,18 @@ use std::str::from_utf8;
 use anyhow::Error;
 use serde_json::value::Value;
 
-pub type Metadata = HashMap<String, MetadataEntry>;
+use crate::urlencode::urlencode;
+
+pub type Metadata = HashMap<String, Entry>;
 
 #[derive(Debug)]
-pub struct MetadataEntry {
+pub struct Entry {
     name: String,
     source: Source,
     repo: Repo,
 }
 
-impl MetadataEntry {
+impl Entry {
     pub fn link(&self) -> Option<String> {
         match self.source {
             Source::CratesIo => Some(format!("https://crates.io/crates/{}", self.name)),
@@ -145,33 +147,8 @@ pub fn load_metadata<'a>() -> Result<Metadata, Error> {
         let source = map.get_as_string("source")?.unwrap_or_default().into();
         let repo = map.get_as_string("repository")?.unwrap_or_default().into();
 
-        metadata.insert(name.clone(), MetadataEntry { name, source, repo });
+        metadata.insert(name.clone(), Entry { name, source, repo });
     }
 
     Ok(metadata)
-}
-
-// This isn't awesome but it beats pulling in an entire crate.
-// https://rosettacode.org/wiki/URL_encoding#Rust
-fn urlencode(input: &str) -> String {
-    const MAX_CHAR_VAL: u32 = std::char::MAX as u32;
-    let mut buff = [0; 4];
-    format!(
-        "{}",
-        input
-            .chars()
-            .map(|ch| {
-                match ch as u32 {
-                    0..=47 | 58..=64 | 91..=96 | 123..=MAX_CHAR_VAL => {
-                        ch.encode_utf8(&mut buff);
-                        buff[0..ch.len_utf8()]
-                            .iter()
-                            .map(|&byte| format!("%{:X}", byte))
-                            .collect::<String>()
-                    }
-                    _ => ch.to_string(),
-                }
-            })
-            .collect::<String>()
-    )
 }

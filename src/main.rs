@@ -4,6 +4,7 @@ use prettytable::{cell, row, Table};
 mod diff;
 mod load;
 mod metadata;
+mod urlencode;
 
 use diff::*;
 use load::*;

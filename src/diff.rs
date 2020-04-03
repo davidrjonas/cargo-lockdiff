@@ -34,7 +34,7 @@ pub fn diff(from: &Lockfile, to: &Lockfile) -> Diff {
     let mut diff = BTreeMap::new();
 
     for pkg in &from.packages {
-        Changes::from_old(pkg).insert(&mut diff);
+        insert_changes(&mut diff, Changes::from_old(pkg))
     }
 
     for pkg in &to.packages {
@@ -47,18 +47,18 @@ pub fn diff(from: &Lockfile, to: &Lockfile) -> Diff {
                 diff.remove(pkg.name.as_str());
             }
         } else {
-            Changes::from_new(pkg).insert(&mut diff);
+            insert_changes(&mut diff, Changes::from_new(pkg))
         }
     }
 
     diff
 }
 
-impl Changes {
-    fn insert(self, diff: &mut Diff) {
-        diff.insert(self.name.clone(), self);
-    }
+fn insert_changes(diff: &mut Diff, ch: Changes) {
+    diff.insert(ch.name.clone(), ch);
+}
 
+impl Changes {
     fn from_old(pkg: &Package) -> Self {
         Self {
             name: pkg.name.as_str().to_owned(),
