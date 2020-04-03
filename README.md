@@ -1,7 +1,11 @@
 cargo-lockdiff
 ==============
 
+[![Crates.io](https://img.shields.io/crates/l/cargo-lockdiff)](https://crates.io/crates/cargo-lockdiff)
+
 See what crates have changed after you run `cargo update` by comparing Cargo.lock to the vcs HEAD or file of your choice.
+
+Supports git, mercurial, and plain files.
 
 Example
 -------
