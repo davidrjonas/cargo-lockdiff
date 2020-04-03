@@ -8,6 +8,7 @@ keywords = ["cargo", "lockdiff", "dependency", "lockfile", "diff"]
 categories = ["command-line-utilities", "development-tools::cargo-plugins"]
 repository = "https://github.com/davidrjonas/cargo-lockdiff"
 readme = "README.md"
+description = "See what crates have changed after you run `cargo update` by comparing Cargo.lock to the vcs ref or file of your choice."
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
