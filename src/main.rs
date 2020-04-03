@@ -3,9 +3,11 @@ use prettytable::{cell, row, Table};
 
 mod diff;
 mod load;
+mod metadata;
 
 use diff::*;
 use load::*;
+use metadata::*;
 
 #[derive(Debug)]
 struct Opts {
@@ -41,7 +43,11 @@ fn main(opts: Opts) -> Result<()> {
     let diff = diff(&from, &to);
 
     if diff.len() > 0 {
-        print_markdown(&diff, !opts.no_links);
+        if opts.no_links {
+            print_markdown_no_links(&diff);
+        } else {
+            print_markdown(&diff, load_metadata()?);
+        }
     } else {
         println!("No changes");
     }
@@ -68,7 +74,7 @@ fn parse_source_opt(opt: &str) -> (Vec<Source>, &str) {
     (vec![source], rest.unwrap_or_default())
 }
 
-fn print_markdown(diff: &Diff, links: bool) {
+fn print_markdown_no_links(diff: &Diff) {
     use prettytable::format::{FormatBuilder, LinePosition::*, LineSeparator};
 
     let format = FormatBuilder::new()
@@ -81,27 +87,71 @@ fn print_markdown(diff: &Diff, links: bool) {
     let mut table = Table::new();
 
     table.set_format(format);
-    table.set_titles(row!["Package", "From", "To"]);
+    table.set_titles(row!["Package", "From", "To", "Compare"]);
 
     for (name, changes) in diff {
-        let col0 = match &changes.link {
-            Some(link) if links => format!("[{}][{}]", name, link.id),
-            _ => name.clone(),
+        table.add_row(row![name, changes.from, changes.to]);
+    }
+
+    table.printstd();
+}
+
+fn print_markdown(diff: &Diff, metadata: Metadata) {
+    use prettytable::format::{FormatBuilder, LinePosition::*, LineSeparator};
+
+    let format = FormatBuilder::new()
+        .borders('|')
+        .column_separator('|')
+        .separator(Title, LineSeparator::new('-', '|', '|', '|'))
+        .padding(1, 1)
+        .build();
+
+    let mut table = Table::new();
+
+    table.set_format(format);
+    table.set_titles(row!["Package", "From", "To", "Compare"]);
+
+    let mut linked: Vec<(u32, String)> = Vec::new();
+    let mut count = 0;
+
+    for (name, changes) in diff {
+        let col0 = match metadata.get(name).map(|v| v.link()).flatten() {
+            Some(link) => {
+                count += 1;
+                linked.push((count, link));
+                format!("[{}][{:02X}]", name, count)
+            }
+            None => name.clone(),
         };
 
-        table.add_row(row![col0, changes.from, changes.to]);
+        let should_compare = changes.from != Version::New && changes.to != Version::Removed;
+
+        let compare = if should_compare {
+            match metadata
+                .get(name)
+                .map(|entry| entry.compare_url(changes.from.to_string(), changes.to.to_string()))
+                .flatten()
+            {
+                Some(url) => {
+                    count += 1;
+                    linked.push((count, url));
+                    format!("[...][{:02X}]", count)
+                }
+                None => "".into(),
+            }
+        } else {
+            "".into()
+        };
+
+        table.add_row(row![col0, changes.from, changes.to, compare]);
     }
 
     table.printstd();
 
-    if links {
-        println!("");
+    println!("");
 
-        for (_, changes) in diff {
-            if let Some(link) = &changes.link {
-                println!("[{}]: {}", link.id, link.url);
-            }
-        }
+    for (id, url) in linked {
+        println!("[{:02X}]: {}", id, url);
     }
 }
 
