@@ -6,7 +6,7 @@ use std::process::Command;
 use std::str::from_utf8;
 use std::str::FromStr;
 
-use anyhow::{Context, Error, Result};
+use eyre::{Context, Error, Result};
 
 use cargo_lock::Lockfile;
 

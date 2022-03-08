@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::process::Command;
 use std::str::from_utf8;
 
-use anyhow::Error;
+use eyre::Error;
 use serde_json::value::Value;
 
 use crate::urlencode::urlencode;
@@ -92,7 +92,7 @@ impl Repo {
     }
 }
 
-fn format_err<T: std::fmt::Display>(s: T) -> anyhow::Error {
+fn format_err<T: std::fmt::Display>(s: T) -> eyre::Error {
     Error::msg(format!("unexpected metadata format; {}", s))
 }
 

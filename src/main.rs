@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Result};
+use eyre::{eyre, Result};
 use prettytable::{cell, row, Table};
 
 mod diff;
@@ -34,12 +34,12 @@ fn main(opts: Opts) -> Result<()> {
     let (from_sources, from_fileish) = parse_source_opt(&opts.from);
 
     let from = load(&from_sources, from_fileish, &opts.path)
-        .map_err(|e| anyhow!("could not read 'from': {}", e))?;
+        .map_err(|e| eyre!("could not read 'from': {}", e))?;
 
     let (to_sources, to_fileish) = parse_source_opt(&opts.to);
 
     let to = load(&to_sources, to_fileish, &opts.path)
-        .map_err(|e| anyhow!("could not read 'to': {}", e))?;
+        .map_err(|e| eyre!("could not read 'to': {}", e))?;
 
     let diff = diff(&from, &to);
 
@@ -187,7 +187,7 @@ Options:
 }
 
 impl paw::ParseArgs for Opts {
-    type Error = anyhow::Error;
+    type Error = eyre::Error;
 
     fn parse_args() -> Result<Self, Self::Error> {
         use std::env;
@@ -206,22 +206,16 @@ impl paw::ParseArgs for Opts {
         while let Some(arg) = args.next() {
             match arg.as_str() {
                 "lockdiff" => {}
-                "-p" | "--path" => {
-                    opts.path = args.next().ok_or_else(|| anyhow!("expected path"))?
-                }
-                "--to" => {
-                    opts.to = args
-                        .next()
-                        .ok_or_else(|| anyhow!("expected 'to' fileish"))?
-                }
+                "-p" | "--path" => opts.path = args.next().ok_or_else(|| eyre!("expected path"))?,
+                "--to" => opts.to = args.next().ok_or_else(|| eyre!("expected 'to' fileish"))?,
                 "--from" => {
                     opts.from = args
                         .next()
-                        .ok_or_else(|| anyhow!("expected 'from' fileish"))?
+                        .ok_or_else(|| eyre!("expected 'from' fileish"))?
                 }
                 "-n" | "--no-links" => opts.no_links = true,
                 "-h" | "--help" => print_help(),
-                arg => return Err(anyhow!("Unknown argument '{}'", arg)),
+                arg => return Err(eyre!("Unknown argument '{}'", arg)),
             }
         }
 
@@ -237,6 +231,6 @@ where
     match std::env::var(key) {
         Ok(v) => Ok(v),
         Err(std::env::VarError::NotPresent) => Ok(default().into()),
-        Err(e) => Err(anyhow::Error::new(e).context(key)),
+        Err(e) => Err(eyre::Report::new(e).wrap_err(key)),
     }
 }
