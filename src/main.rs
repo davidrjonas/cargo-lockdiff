@@ -43,7 +43,7 @@ fn main(opts: Opts) -> Result<()> {
 
     let diff = diff(&from, &to);
 
-    if diff.is_empty() {
+    if !diff.is_empty() {
         if opts.no_links {
             print_markdown_no_links(&diff);
         } else {
