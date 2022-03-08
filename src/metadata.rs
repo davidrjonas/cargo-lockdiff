@@ -121,7 +121,6 @@ pub fn load_metadata() -> Result<Metadata, Error> {
         .arg("--format-version")
         .arg("1")
         .arg("--all-features")
-        .arg("--offline")
         .output()?;
 
     if !output.status.success() {

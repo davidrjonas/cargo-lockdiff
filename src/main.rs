@@ -1,3 +1,4 @@
+use clap::Parser;
 use eyre::{eyre, Result};
 use prettytable::{cell, row, Table};
 
@@ -10,27 +11,33 @@ use diff::*;
 use load::*;
 use metadata::*;
 
-#[derive(Debug)]
+#[derive(Debug, Parser)]
+#[clap(version, about, long_about = None)]
 struct Opts {
-    /// base to with which to prefix paths. E.g. `-p app` would look for HEAD:app/Cargo.lock and app/Cargo.lock
+    /// Base to with which to prefix paths. E.g. `-p app` would look for HEAD:app/Cargo.lock and app/Cargo.lock
+    #[clap(long, default_value = "", env = "CARGO_LOCKDIFF_PATH")]
     path: String,
 
-    /// the file, vcs ref, or vcs ref with filename to compare from. To force the use of a
+    /// The file, vcs ref, or vcs ref with filename to compare from. To force the use of a
     /// particular vcs, prepend it with a colon. E.g. "hg:.". The ref is required if the vcs is
     /// specified.
+    #[clap(long, default_value = "HEAD", env = "CARGO_LOCKDIFF_FROM")]
     from: String,
 
-    /// the file, vcs ref, or vcs ref with filename to compare to. To force the use of a
+    /// The file, vcs ref, or vcs ref with filename to compare to. To force the use of a
     /// particular vcs, prepend it with a colon. E.g. "hg:.". The ref is required if the vcs is
     /// specified.
+    #[clap(long, default_value = "", env = "CARGO_LOCKDIFF_TO")]
     to: String,
 
-    /// do not include links
+    /// Do not include links (links requires `cargo metadata` which may require network ops)
+    #[clap(short = 'n', long, env = "CARGO_LOCKDIFF_NO_LINKS")]
     no_links: bool,
 }
 
-#[paw::main]
-fn main(opts: Opts) -> Result<()> {
+fn main() -> Result<()> {
+    let opts = Opts::parse();
+
     let (from_sources, from_fileish) = parse_source_opt(&opts.from);
 
     let from = load(&from_sources, from_fileish, &opts.path)
@@ -153,84 +160,5 @@ fn print_markdown(diff: &Diff, metadata: Metadata) {
 
     for (id, url) in linked {
         println!("[{:02X}]: {}", id, url);
-    }
-}
-
-fn print_help() {
-    println!(
-        r#"Usage: cargo lockdiff [-p <path>] [--from <from>] [--to <to>] [-l]
-
-Diff your lock file, see what's changed. Use these options or environment variables prefixed with
-`CARGO_LOCKDIFF_`, such as `CARGO_LOCKDIFF_NO_LINKS=true`.
-
-Options:
-  -p, --path        Base to with which to prefix paths. E.g. `-p app` would look
-                    for HEAD:app/Cargo.lock and app/Cargo.lock. Env: CARGO_LOCKDIFF_PATH
-
-  --from            The file, vcs ref, or vcs ref with filename to compare from.
-                    To force the use of a particular vcs, prepend it with a
-                    colon. E.g. "hg:.". The ref is required if the vcs is
-                    specified. Env: CARGO_LOCKDIFF_FROM
-
-  --to              The file, vcs ref, or vcs ref with filename to compare to.
-                    To force the use of a particular vcs, prepend it with a
-                    colon. E.g. "hg:.". The ref is required if the vcs is
-                    specified. Env: CARGO_LOCKDIFF_TO
-
-  -n, --no-links    Include links to where possible. Env: CARGO_LOCKDIFF_NO_LINKS
-
-  -h, --help        Display usage information
-    "#
-    );
-
-    std::process::exit(0);
-}
-
-impl paw::ParseArgs for Opts {
-    type Error = eyre::Error;
-
-    fn parse_args() -> Result<Self, Self::Error> {
-        use std::env;
-
-        let mut args = env::args().skip(1);
-
-        let mut opts = Opts {
-            path: get_env("CARGO_LOCKDIFF_PATH", || "")?,
-            from: get_env("CARGO_LOCKDIFF_FROM", || "HEAD")?,
-            to: get_env("CARGO_LOCKDIFF_TO", || "")?,
-            no_links: get_env("CARGO_LOCKDIFF_NO_LINKS", || "")?
-                .parse()
-                .unwrap_or(false),
-        };
-
-        while let Some(arg) = args.next() {
-            match arg.as_str() {
-                "lockdiff" => {}
-                "-p" | "--path" => opts.path = args.next().ok_or_else(|| eyre!("expected path"))?,
-                "--to" => opts.to = args.next().ok_or_else(|| eyre!("expected 'to' fileish"))?,
-                "--from" => {
-                    opts.from = args
-                        .next()
-                        .ok_or_else(|| eyre!("expected 'from' fileish"))?
-                }
-                "-n" | "--no-links" => opts.no_links = true,
-                "-h" | "--help" => print_help(),
-                arg => return Err(eyre!("Unknown argument '{}'", arg)),
-            }
-        }
-
-        Ok(opts)
-    }
-}
-
-fn get_env<T, F>(key: &'static str, default: F) -> Result<String>
-where
-    F: FnOnce() -> T,
-    T: Into<String>,
-{
-    match std::env::var(key) {
-        Ok(v) => Ok(v),
-        Err(std::env::VarError::NotPresent) => Ok(default().into()),
-        Err(e) => Err(eyre::Report::new(e).wrap_err(key)),
     }
 }
