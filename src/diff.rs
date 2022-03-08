@@ -5,6 +5,7 @@ use cargo_lock::{Lockfile, Package};
 
 pub type Diff = BTreeMap<String, Changes>;
 
+#[derive(Debug)]
 pub struct Changes {
     pub name: String,
     pub from: Version,
