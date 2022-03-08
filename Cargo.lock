@@ -92,6 +92,7 @@ dependencies = [
  "clap",
  "eyre",
  "prettytable-rs",
+ "serde",
  "serde_json",
 ]
 

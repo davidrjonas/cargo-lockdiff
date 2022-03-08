@@ -31,8 +31,35 @@ struct Opts {
     to: String,
 
     /// Do not include links (links requires `cargo metadata` which may require network ops)
+    /// "json" output format does not include links.
     #[clap(short = 'n', long, env = "CARGO_LOCKDIFF_NO_LINKS")]
     no_links: bool,
+
+    /// Select output format, one of ["markdown", "json"].
+    #[clap(
+        short = 'o',
+        long,
+        default_value = "markdown",
+        env = "CARGO_LOCKDIFF_FORMAT"
+    )]
+    format: Format,
+}
+
+#[derive(Debug)]
+enum Format {
+    Json,
+    Markdown,
+}
+
+impl std::str::FromStr for Format {
+    type Err = eyre::Error;
+    fn from_str(s: &str) -> Result<Self> {
+        match s {
+            "json" => Ok(Self::Json),
+            "markdown" => Ok(Self::Markdown),
+            _ => Err(eyre!("Unknown format; try one of [\"markdown\", \"json\"]")),
+        }
+    }
 }
 
 fn main() -> Result<()> {
@@ -50,16 +77,34 @@ fn main() -> Result<()> {
 
     let diff = diff(&from, &to);
 
-    if !diff.is_empty() {
-        if opts.no_links {
-            print_markdown_no_links(&diff);
-        } else {
-            print_markdown(&diff, load_metadata()?);
-        }
-    } else {
-        println!("No changes");
+    match opts.format {
+        Format::Markdown => format_markdown(&opts, &diff)?,
+        Format::Json => format_json(&opts, &diff)?,
     }
 
+    Ok(())
+}
+
+fn format_markdown(opts: &Opts, diff: &Diff) -> Result<()> {
+    if diff.is_empty() {
+        println!("No changes");
+        return Ok(());
+    }
+
+    if opts.no_links {
+        print_markdown_no_links(diff);
+    } else {
+        print_markdown(diff, load_metadata()?);
+    }
+    Ok(())
+}
+
+fn format_json(_opts: &Opts, diff: &Diff) -> Result<()> {
+    if diff.is_empty() {
+        println!("{{}}");
+    } else {
+        println!("{}", serde_json::to_string(diff)?);
+    }
     Ok(())
 }
 
@@ -123,7 +168,7 @@ fn print_markdown(diff: &Diff, metadata: Metadata) {
     let mut count = 0;
 
     for (name, changes) in diff {
-        let col0 = match metadata.get(name).map(|v| v.link()).flatten() {
+        let col0 = match metadata.get(name).and_then(|v| v.link()) {
             Some(link) => {
                 count += 1;
                 linked.push((count, link));
@@ -135,11 +180,9 @@ fn print_markdown(diff: &Diff, metadata: Metadata) {
         let should_compare = changes.from != Version::New && changes.to != Version::Removed;
 
         let compare = if should_compare {
-            match metadata
-                .get(name)
-                .map(|entry| entry.compare_url(changes.from.to_string(), changes.to.to_string()))
-                .flatten()
-            {
+            match metadata.get(name).and_then(|entry| {
+                entry.compare_url(changes.from.to_string(), changes.to.to_string())
+            }) {
                 Some(url) => {
                     count += 1;
                     linked.push((count, url));

@@ -5,14 +5,14 @@ use cargo_lock::{Lockfile, Package};
 
 pub type Diff = BTreeMap<String, Changes>;
 
-#[derive(Debug)]
+#[derive(Debug, serde::Serialize)]
 pub struct Changes {
     pub name: String,
     pub from: Version,
     pub to: Version,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, serde::Serialize)]
 pub enum Version {
     New,
     Removed,
