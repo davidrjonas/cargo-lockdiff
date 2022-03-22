@@ -12,7 +12,12 @@ use load::*;
 use metadata::*;
 
 #[derive(Debug, Parser)]
-#[clap(version, about, long_about = None)]
+#[clap(version, about, long_about = None, bin_name = "cargo lockdiff")]
+enum Cli {
+    Lockdiff(Opts),
+}
+
+#[derive(Debug, clap::Args)]
 struct Opts {
     /// Base to with which to prefix paths. E.g. `-p app` would look for HEAD:app/Cargo.lock and app/Cargo.lock
     #[clap(long, default_value = "", env = "CARGO_LOCKDIFF_PATH")]
@@ -63,7 +68,7 @@ impl std::str::FromStr for Format {
 }
 
 fn main() -> Result<()> {
-    let opts = Opts::parse();
+    let Cli::Lockdiff(opts) = Cli::parse();
 
     let (from_sources, from_fileish) = parse_source_opt(&opts.from);
 
