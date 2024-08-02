@@ -1,5 +1,7 @@
 ### [Unreleased]
 
+- Update: update pretty-table to 0.10
+
 ### [0.3.1] - 2022-03-21
 
 - Fix: works as cargo subcommand again
