@@ -1,6 +1,6 @@
 use clap::Parser;
 use eyre::{eyre, Result};
-use prettytable::{cell, row, Table};
+use prettytable::{row, Table};
 
 mod diff;
 mod load;
