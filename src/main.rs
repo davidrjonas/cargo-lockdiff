@@ -50,7 +50,7 @@ struct Opts {
     format: Format,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 enum Format {
     Json,
     Markdown,
