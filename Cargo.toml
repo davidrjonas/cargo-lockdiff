@@ -14,7 +14,7 @@ description = "See what crates have changed after you run `cargo update` by comp
 
 [dependencies]
 eyre = "^0.6"
-cargo-lock = { version = "7", default-features = false, features = [] }
+cargo-lock = { version = "9", default-features = false, features = [] }
 clap = { version = "4", features = ["cargo", "derive", "env"] }
 prettytable-rs = "0.10"
 serde = "1"
