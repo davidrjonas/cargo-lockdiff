@@ -1,3 +1,5 @@
+use std::fmt::Write;
+
 // This isn't awesome but it beats pulling in an entire crate.
 // https://rosettacode.org/wiki/URL_encoding#Rust
 pub fn urlencode(input: &str) -> String {
@@ -10,8 +12,10 @@ pub fn urlencode(input: &str) -> String {
                 ch.encode_utf8(&mut buff);
                 buff[0..ch.len_utf8()]
                     .iter()
-                    .map(|&byte| format!("%{:X}", byte))
-                    .collect::<String>()
+                    .fold(String::new(), |mut output, byte| {
+                        let _ = write!(output, "%{byte:X}");
+                        output
+                    })
             }
             _ => ch.to_string(),
         })
