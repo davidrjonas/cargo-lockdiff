@@ -26,16 +26,12 @@ impl Entry {
     }
 
     pub fn compare_url<A: AsRef<str>, B: AsRef<str>>(&self, from: A, to: B) -> Option<String> {
-        use RepoKind::*;
-        match self.repo.kind {
-            Unknown => None,
-            Github => Some(format!(
-                "{}/compare/{}...{}",
-                self.repo.url.trim_end_matches(".git"),
-                urlencode(from.as_ref()),
-                urlencode(to.as_ref())
-            )),
-        }
+        let name = urlencode(&self.name);
+        Some(format!(
+            "https://diff.rs/{name}/{}/{name}/{}/Cargo.toml",
+            urlencode(from.as_ref()),
+            urlencode(to.as_ref())
+        ))
     }
 }
 
@@ -73,6 +69,7 @@ impl From<&str> for RepoKind {
 
 #[derive(Debug)]
 struct Repo {
+    #[allow(dead_code)]
     kind: RepoKind,
     url: String,
 }

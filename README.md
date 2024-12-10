@@ -37,26 +37,26 @@ $ cargo lockdiff --from "HEAD@{2 months ago}"
 | [tracing-attributes][F3]     | 0.1.5   | 0.1.7                        | [...][F4]  |
 
 [C6]: https://crates.io/crates/serde_json
-[C7]: https://github.com/serde-rs/json/compare/1%2E0%2E42...1%2E0%2E48
+[C7]: https://diff.rs/serde%5Fjson/1%2E0%2E42/serde%5Fjson/1%2E0%2E48/Cargo.toml
 [C8]: https://crates.io/crates/sha2
-[C9]: https://github.com/RustCrypto/hashes/compare/0%2E8%2E0...0%2E8%2E1
+[C9]: https://diff.rs/sha2/0%2E8%2E0/sha2/0%2E8%2E1/Cargo.toml
 [CA]: https://crates.io/crates/sharded-slab
 [CB]: https://crates.io/crates/smallvec
-[CC]: https://github.com/servo/rust-smallvec/compare/1%2E0%2E0...1%2E2%2E0
+[CC]: https://diff.rs/smallvec/1%2E0%2E0/smallvec/1%2E2%2E0/Cargo.toml
 [CD]: https://crates.io/crates/strum
 [CE]: https://crates.io/crates/strum_macros
 [CF]: https://crates.io/crates/syn
-[D0]: https://github.com/dtolnay/syn/compare/1%2E0%2E11...1%2E0%2E17
+[D0]: https://diff.rs/syn/1%2E0%2E11/syn/1%2E0%2E17/Cargo.toml
 [D2]: https://crates.io/crates/thiserror
 [D3]: https://crates.io/crates/thiserror-impl
 [D4]: https://crates.io/crates/thread_local
 [D5]: https://crates.io/crates/tokio
 [D6]: https://crates.io/crates/tokio-codec
-[D7]: https://github.com/tokio-rs/tokio/compare/0%2E1%2E1...0%2E1%2E2
+[D7]: https://diff.rs/tokio%2Dcodec/0%2E1%2E1/tokio%2Dcodec/0%2E1%2E2/Cargo.toml
 [F1]: https://crates.io/crates/tracing
-[F2]: https://github.com/tokio-rs/tracing/compare/0%2E1%2E10...0%2E1%2E13
+[F2]: https://diff.rs/tracing/0%2E1%2E10/tracing/0%2E1%2E13/Cargo.toml
 [F3]: https://crates.io/crates/tracing-attributes
-[F4]: https://github.com/tokio-rs/tracing/compare/0%2E1%2E5...0%2E1%2E7
+[F4]: https://diff.rs/tracing%2Dattributes/0%2E1%2E5/tracing%2Dattributes/0%2E1%2E7/Cargo.toml
 ```
 
 ### Rendered
@@ -83,26 +83,26 @@ $ cargo lockdiff --from "HEAD@{2 months ago}"
 | [tracing-attributes][F3]     | 0.1.5   | 0.1.7                        | [...][F4]  |
 
 [C6]: https://crates.io/crates/serde_json
-[C7]: https://github.com/serde-rs/json/compare/1%2E0%2E42...1%2E0%2E48
+[C7]: https://diff.rs/serde%5Fjson/1%2E0%2E42/serde%5Fjson/1%2E0%2E48/Cargo.toml
 [C8]: https://crates.io/crates/sha2
-[C9]: https://github.com/RustCrypto/hashes/compare/0%2E8%2E0...0%2E8%2E1
+[C9]: https://diff.rs/sha2/0%2E8%2E0/sha2/0%2E8%2E1/Cargo.toml
 [CA]: https://crates.io/crates/sharded-slab
 [CB]: https://crates.io/crates/smallvec
-[CC]: https://github.com/servo/rust-smallvec/compare/1%2E0%2E0...1%2E2%2E0
+[CC]: https://diff.rs/smallvec/1%2E0%2E0/smallvec/1%2E2%2E0/Cargo.toml
 [CD]: https://crates.io/crates/strum
 [CE]: https://crates.io/crates/strum_macros
 [CF]: https://crates.io/crates/syn
-[D0]: https://github.com/dtolnay/syn/compare/1%2E0%2E11...1%2E0%2E17
+[D0]: https://diff.rs/syn/1%2E0%2E11/syn/1%2E0%2E17/Cargo.toml
 [D2]: https://crates.io/crates/thiserror
 [D3]: https://crates.io/crates/thiserror-impl
 [D4]: https://crates.io/crates/thread_local
 [D5]: https://crates.io/crates/tokio
 [D6]: https://crates.io/crates/tokio-codec
-[D7]: https://github.com/tokio-rs/tokio/compare/0%2E1%2E1...0%2E1%2E2
+[D7]: https://diff.rs/tokio%2Dcodec/0%2E1%2E1/tokio%2Dcodec/0%2E1%2E2/Cargo.toml
 [F1]: https://crates.io/crates/tracing
-[F2]: https://github.com/tokio-rs/tracing/compare/0%2E1%2E10...0%2E1%2E13
+[F2]: https://diff.rs/tracing/0%2E1%2E10/tracing/0%2E1%2E13/Cargo.toml
 [F3]: https://crates.io/crates/tracing-attributes
-[F4]: https://github.com/tokio-rs/tracing/compare/0%2E1%2E5...0%2E1%2E7
+[F4]: https://diff.rs/tracing%2Dattributes/0%2E1%2E5/tracing%2Dattributes/0%2E1%2E7/Cargo.toml
 
 Install
 -------

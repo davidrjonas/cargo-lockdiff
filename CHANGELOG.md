@@ -1,5 +1,7 @@
 ### [Unreleased]
 
+- Update: use diff.rs for compare links
+
 ### [0.3.2] - 2024-09-27
 
 - Update: Rust edition 2021
