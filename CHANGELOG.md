@@ -1,5 +1,7 @@
 ### [Unreleased]
 
+### [0.4.0] - 2024-12-09
+
 - Update: use diff.rs for compare links
 
 ### [0.3.2] - 2024-09-27
@@ -32,5 +34,6 @@
 [0.3.0]: https://github.com/davidrjonas/cargo-lockdiff/compare/0.2.0...0.3.0
 [0.3.1]: https://github.com/davidrjonas/cargo-lockdiff/compare/0.3.0...0.3.1
 [0.3.2]: https://github.com/davidrjonas/cargo-lockdiff/compare/0.3.1...0.3.2
-[Unreleased]: https://github.com/davidrjonas/cargo-lockdiff/compare/0.3.2...master
+[0.4.0]: https://github.com/davidrjonas/cargo-lockdiff/compare/0.3.2...0.4.0
+[Unreleased]: https://github.com/davidrjonas/cargo-lockdiff/compare/0.4.0...master
 
