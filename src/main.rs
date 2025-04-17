@@ -1,6 +1,6 @@
 use clap::Parser;
-use eyre::{eyre, Result};
-use prettytable::{row, Table};
+use eyre::{Result, eyre};
+use prettytable::{Table, row};
 
 mod diff;
 mod load;
@@ -67,7 +67,7 @@ impl std::str::FromStr for Format {
     }
 }
 
-fn main() -> Result<()> {
+fn main() -> eyre::Result<()> {
     let Cli::Lockdiff(opts) = Cli::parse();
 
     let (from_sources, from_fileish) = parse_source_opt(&opts.from);
