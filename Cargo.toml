@@ -1,6 +1,6 @@
 [package]
 name = "cargo-lockdiff"
-version = "0.4.0"
+version = "0.5.0"
 authors = ["David Jonas <djonas@noip.com>"]
 edition = "2024"
 license = "MIT"

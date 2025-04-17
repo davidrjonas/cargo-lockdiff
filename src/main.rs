@@ -67,7 +67,7 @@ impl std::str::FromStr for Format {
     }
 }
 
-fn main() -> eyre::Result<()> {
+fn main() -> Result<()> {
     let Cli::Lockdiff(opts) = Cli::parse();
 
     let (from_sources, from_fileish) = parse_source_opt(&opts.from);
