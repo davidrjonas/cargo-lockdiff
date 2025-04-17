@@ -2,7 +2,7 @@
 name = "cargo-lockdiff"
 version = "0.4.0"
 authors = ["David Jonas <djonas@noip.com>"]
-edition = "2021"
+edition = "2024"
 license = "MIT"
 keywords = ["cargo", "lockdiff", "dependency", "lockfile", "diff"]
 categories = ["command-line-utilities", "development-tools::cargo-plugins"]
